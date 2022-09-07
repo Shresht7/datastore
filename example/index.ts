@@ -1,7 +1,7 @@
 //  Library
 import { DataStore } from '../src'
 
-const datastore = new DataStore<string>({ file: 'db.txt' })
+const datastore = new DataStore({ file: 'db.json' })
 
 async function main() {
 
@@ -9,7 +9,13 @@ async function main() {
 
     console.log(datastore.data)
 
-    datastore.data = 'Hello World'
+    datastore.data = {
+        one: 1,
+        two: [2, 2],
+        three: {
+            wow: "!!!"
+        }
+    }
 
     console.log(datastore.data)
 

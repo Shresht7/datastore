@@ -17,7 +17,8 @@ export class JSONAdapter<T> implements Adapter<T> {
         let contents: string | Buffer
         try {
             contents = await fs.promises.readFile(this.fileName, { encoding: this.encoding })
-            return JSON.parse(contents.toString())
+            contents = contents.toString() || '{}'
+            return JSON.parse(contents)
         } catch (err) {
             throw err
         }
