@@ -1,7 +1,10 @@
 //  Library
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { TextAdapter } from './adapters'
+import {
+    MemoryAdapter,
+    TextAdapter,
+} from './adapters'
 
 //  Type Definitions
 import type { Adapter } from './types'
@@ -36,7 +39,7 @@ export class DataStore<T> {
         if (['.txt', '.text'].includes(extName)) {
             return new TextAdapter(this.fileName, this.options.encoding)
         }
-        return new TextAdapter(this.fileName, this.options.encoding)
+        return new MemoryAdapter<T>()
     }
 
     async read(): Promise<T | undefined> {
