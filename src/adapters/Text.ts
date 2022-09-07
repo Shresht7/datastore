@@ -8,7 +8,7 @@ import { Adapter } from '../types'
 //  Text Adapter
 //  ------------
 
-export class TextAdapter<T> implements Adapter<string | Buffer> {
+export class TextAdapter implements Adapter<string | Buffer> {
 
     constructor(private fileName: string, private encoding?: BufferEncoding) {
     }

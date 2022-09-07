@@ -1,20 +1,52 @@
+//  Library
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { TextAdapter } from './adapters'
+
+//  Type Definitions
+import type { Adapter } from './types'
+
 //  ---------
 //  DataStore
 //  ---------
 
+interface DataStoreOptions {
+    encoding?: BufferEncoding
+}
+
+const defaultOptions: DataStoreOptions = {
+    encoding: 'utf-8'
+}
+
 export class DataStore<T> {
 
-    public readonly data: T | null = null
+    public data: T | undefined
 
-    constructor(private fileName: string) {
+    private adapter: Adapter<any>
+
+    constructor(private readonly fileName: string, private options: DataStoreOptions = defaultOptions) {
+        if (!fs.existsSync(fileName)) {
+            fs.writeFileSync(fileName, '', this.options.encoding)
+        }
+        this.adapter = this.getAdapter()
     }
 
-    async read(): Promise<void> {
-        console.log('Async Read')
+    private getAdapter() {
+        const extName = path.extname(this.fileName)
+        if (['.txt', '.text'].includes(extName)) {
+            return new TextAdapter(this.fileName, this.options.encoding)
+        }
+        return new TextAdapter(this.fileName, this.options.encoding)
     }
 
-    async write(): Promise<void> {
-        console.log('Async Write')
+    async read(): Promise<T | undefined> {
+        this.data = await this.adapter.read()
+        return this.data
+    }
+
+    async write(data?: T): Promise<void> {
+        if (!data) { return }
+        return this.adapter.write(data)
     }
 
 }
