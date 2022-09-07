@@ -1,0 +1,5 @@
+//  --------
+//  ADAPTERS
+//  --------
+
+export * from './Text'
