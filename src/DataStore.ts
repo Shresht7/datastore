@@ -2,6 +2,7 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import {
+    JSONAdapter,
     MemoryAdapter,
     TextAdapter,
 } from './adapters'
@@ -46,6 +47,8 @@ export class DataStore<T> {
             const extName = path.extname(this.options.file)
             if (['.txt', '.text'].includes(extName)) {
                 return new TextAdapter(this.options.file, this.options.encoding)
+            } else if (['.json'].includes(extName)) {
+                return new JSONAdapter(this.options.file, this.options.encoding)
             }
         }
 
