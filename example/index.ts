@@ -1,7 +1,7 @@
 //  Library
 import { DataStore } from '../src'
 
-const datastore = new DataStore<string>('db.txt')
+const datastore = new DataStore<string>({ file: 'db.txt' })
 
 async function main() {
 

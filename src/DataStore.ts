@@ -14,6 +14,7 @@ import type { Adapter } from './types'
 //  ---------
 
 interface DataStoreOptions {
+    file?: string
     encoding?: BufferEncoding
 }
 
@@ -27,18 +28,28 @@ export class DataStore<T> {
 
     private adapter: Adapter<any>
 
-    constructor(private readonly fileName: string, private options: DataStoreOptions = defaultOptions) {
-        if (!fs.existsSync(fileName)) {
-            fs.writeFileSync(fileName, '', this.options.encoding)
-        }
+    constructor(private options: DataStoreOptions = defaultOptions) {
         this.adapter = this.getAdapter()
     }
 
     private getAdapter() {
-        const extName = path.extname(this.fileName)
-        if (['.txt', '.text'].includes(extName)) {
-            return new TextAdapter(this.fileName, this.options.encoding)
+        if (!this.options.file) {
+            //  Use the Memory Adapter if no file was specified
+            return new MemoryAdapter<T>()
+        } else {
+            //  Check if the file exists, and create it if it doesn't
+            if (!fs.existsSync(this.options.file)) {
+                fs.writeFileSync(this.options.file, '', this.options.encoding)
+            }
+
+            //  Retrieve the correct adapter based on the file extension
+            const extName = path.extname(this.options.file)
+            if (['.txt', '.text'].includes(extName)) {
+                return new TextAdapter(this.options.file, this.options.encoding)
+            }
         }
+
+        //  Fallback to MemoryAdapter if no other adapter was selected
         return new MemoryAdapter<T>()
     }
 
