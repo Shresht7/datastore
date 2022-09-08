@@ -1,32 +1,22 @@
 //  Library
-import * as fs from 'node:fs'
-
-//  Type Definitions
-import { Adapter } from '../types'
+import { TextAdapter } from './Text'
 
 //  ------------
 //  JSON Adapter
 //  ------------
 
-export class JSONAdapter<T> implements Adapter<T> {
+export class JSONAdapter<T> extends TextAdapter<T> {
 
-    constructor(private fileName: string, private encoding?: BufferEncoding) {
+    constructor(fileName: string, encoding?: BufferEncoding) {
+        super(fileName, encoding)
     }
 
-    async read(): Promise<T> {
-        let contents: string | Buffer
-        try {
-            contents = await fs.promises.readFile(this.fileName, { encoding: this.encoding })
-            contents = contents.toString() || '{}'
-            return JSON.parse(contents)
-        } catch (err) {
-            throw err
-        }
+    parse(input: string): T {
+        return JSON.parse(input)
     }
 
-    async write(data: T): Promise<void> {
-        const contents = JSON.stringify(data, null, 2)
-        return fs.promises.writeFile(this.fileName, contents, { encoding: this.encoding })
+    serialize(output: T): string {
+        return JSON.stringify(output, null, 2)
     }
 
 }

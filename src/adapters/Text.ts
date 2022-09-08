@@ -8,21 +8,34 @@ import { Adapter } from '../types'
 //  Text Adapter
 //  ------------
 
-export class TextAdapter implements Adapter<string | Buffer> {
+type Text = string | Buffer
+
+export class TextAdapter<T = Text> implements Adapter<Text, T> {
 
     constructor(private fileName: string, private encoding?: BufferEncoding) {
     }
 
-    async read(): Promise<string | Buffer> {
+    async read(): Promise<T | undefined> {
+        let contents: Text
         try {
-            return fs.promises.readFile(this.fileName, { encoding: this.encoding })
+            contents = await fs.promises.readFile(this.fileName, { encoding: this.encoding })
         } catch (err) {
             throw err
         }
+        return this.parse(contents)
     }
 
-    async write(data: string | Buffer): Promise<void> {
-        return fs.promises.writeFile(this.fileName, data, { encoding: this.encoding })
+    parse(input: Text): T {
+        return input as T
+    }
+
+    serialize(output: T): Text {
+        return output as Text
+    }
+
+    async write(data: T): Promise<void> {
+        const contents = this.serialize(data)
+        return fs.promises.writeFile(this.fileName, contents, { encoding: this.encoding })
     }
 
 }
