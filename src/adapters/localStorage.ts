@@ -5,35 +5,16 @@ import type { Adapter } from '../types'
 //  Local Storage Adapter
 //  ---------------------
 
-export class LocalStorageAdapter<T> implements Adapter<string, T> {
+export class LocalStorageAdapter implements Adapter<string> {
 
-    private keyName: string
+    constructor(private keyName: string) { }
 
-    constructor(fileName: string) {
-        this.keyName = fileName
+    read(): string | undefined {
+        return global.localStorage.getItem(this.keyName) || undefined
     }
 
-    read() {
-        return new Promise<T>((resolve, reject) => {
-            const data = window.localStorage.getItem(this.keyName) || ''
-            resolve(this.parse(data))
-        })
-    }
-
-    parse(str: string): T {
-        return JSON.parse(str)
-    }
-
-    serialize(data: T): string {
-        return JSON.stringify(data)
-    }
-
-    write(data: T) {
-        return new Promise<void>((resolve, reject) => {
-            const contents = this.serialize(data)
-            window.localStorage.setItem(this.keyName, contents)
-            resolve()
-        })
+    write(data: string) {
+        return global.localStorage.setItem(this.keyName, data)
     }
 
 }

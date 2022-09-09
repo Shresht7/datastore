@@ -9,16 +9,14 @@ export class MemoryAdapter<T> implements Adapter<T> {
 
     private data: T | undefined
 
-    constructor() {
+    constructor() { }
+
+    read(): T | undefined {
+        return this.data
     }
 
-    read(): Promise<T | undefined> {
-        return Promise.resolve(this.data)
-    }
-
-    write(data: T): Promise<void> {
-        this.data = data
-        return Promise.resolve()
+    write(data: T) {
+        return this.data = data
     }
 
 }

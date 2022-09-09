@@ -1,15 +1,13 @@
 //  Library
-import { TextAdapter } from './Text'
+import type { Transformer } from '../types'
 
 //  ------------
 //  JSON Adapter
 //  ------------
 
-export class JSONAdapter<T> extends TextAdapter<T> {
+export class JSONTransformer<T> implements Transformer<T, string> {
 
-    constructor(fileName: string, encoding?: BufferEncoding) {
-        super(fileName, encoding)
-    }
+    constructor() { }
 
     parse(input: string): T {
         return JSON.parse(input)

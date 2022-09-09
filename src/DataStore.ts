@@ -1,69 +1,70 @@
 //  Library
-import * as fs from 'node:fs'
-import * as path from 'node:path'
-import {
-    JSONAdapter,
-    MemoryAdapter,
-    TextAdapter,
-} from './adapters'
+import { LocalStorageAdapter, MemoryAdapter, TextAdapter } from './adapters'
+import { JSONTransformer } from './transformers'
 
 //  Type Definitions
-import type { Adapter } from './types'
+import { Adapter, Transformer, Kind } from './types'
 
 //  ---------
 //  DataStore
 //  ---------
 
-interface DataStoreOptions {
-    file?: string
+type DataStoreOpts<T> = {
+    kind: Kind.MEMORY
+    transformer?: Transformer<T>
+    default?: T
+} | {
+    kind: Kind.LOCAL_STORAGE
+    keyName: string
+    transformer?: Transformer<T, string>
+    default?: T
+} | {
+    kind?: Kind.FILE_SYSTEM
+    file: string
     encoding?: BufferEncoding
+    transformer?: Transformer<T, string>
+    default?: T
 }
 
-const defaultOptions: DataStoreOptions = {
-    encoding: 'utf-8'
+const defaultOptions: DataStoreOpts<any> = {
+    kind: Kind.MEMORY,
 }
 
 export class DataStore<T> {
 
     public data: T | undefined
-
     private adapter: Adapter<any>
+    private transformer: Transformer<T, any>
 
-    constructor(private options: DataStoreOptions = defaultOptions) {
-        this.adapter = this.getAdapter()
+    constructor(private options: DataStoreOpts<T> = defaultOptions) {
+        this.data = this.options.default
+        this.adapter = this._loadAdapter()
+        this.transformer = this.options.transformer || new JSONTransformer<T>()
     }
 
-    private getAdapter() {
-        if (!this.options.file) {
-            //  Use the Memory Adapter if no file was specified
-            return new MemoryAdapter<T>()
-        } else {
-            //  Check if the file exists, and create it if it doesn't
-            if (!fs.existsSync(this.options.file)) {
-                fs.writeFileSync(this.options.file, '', this.options.encoding)
-            }
-
-            //  Retrieve the correct adapter based on the file extension
-            const extName = path.extname(this.options.file)
-            if (['.txt', '.text'].includes(extName)) {
-                return new TextAdapter(this.options.file, this.options.encoding)
-            } else if (['.json'].includes(extName)) {
-                return new JSONAdapter(this.options.file, this.options.encoding)
-            }
+    private _loadAdapter() {
+        switch (this.options.kind) {
+            case Kind.FILE_SYSTEM:
+                return new TextAdapter(this.options.file, this.options.encoding || 'utf-8')
+            case Kind.LOCAL_STORAGE:
+                return new LocalStorageAdapter(this.options.keyName)
+            case Kind.MEMORY:
+                return new MemoryAdapter<T>()
+            default:
+                return new MemoryAdapter<T>()
         }
-
-        //  Fallback to MemoryAdapter if no other adapter was selected
-        return new MemoryAdapter<T>()
     }
 
-    async read(): Promise<T | undefined> {
-        this.data = await this.adapter.read()
+    async read() {
+        const contents = await this.adapter.read()
+        if (!contents) { return }
+        this.data = this.transformer.parse(contents)
         return this.data
     }
 
-    async write(data?: T): Promise<void> {
-        if (!data) { return }
-        return this.adapter.write(data)
+    async write(data: T) {
+        const contents = this.transformer.serialize(data)
+        return this.adapter.write(contents)
     }
 
 }
