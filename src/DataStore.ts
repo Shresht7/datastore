@@ -1,5 +1,5 @@
 //  Library
-import { TextAdapter, LocalStorageAdapter, MemoryAdapter } from './adapters'
+import { FSAdapter, LocalStorageAdapter, MemoryAdapter } from './adapters'
 import { Transformer, NonTransformer, JSONTransformer } from './transformers'
 
 //  Type Definitions
@@ -63,7 +63,7 @@ interface FSDataStoreOptions<T> extends Partial<DataStoreOptions<T, string>> {
 export class FSDataStore<T> extends DataStore<T, string> {
     constructor(options: FSDataStoreOptions<T>) {
         super({
-            adapter: new TextAdapter(options.file, options.encoding),
+            adapter: new FSAdapter(options.file, options.encoding),
             transformer: new JSONTransformer(),
             ...options,
         })

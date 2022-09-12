@@ -3,5 +3,5 @@
 //  --------
 
 export * from './Memory'
-export * from './Text'
+export * from './FS'
 export * from './localStorage'
