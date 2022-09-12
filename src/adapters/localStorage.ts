@@ -1,11 +1,11 @@
 //  Type Definitions
-import type { Adapter } from '../types'
+import type { IAdapter } from '../types'
 
 //  ---------------------
 //  Local Storage Adapter
 //  ---------------------
 
-export class LocalStorageAdapter implements Adapter<string> {
+export class LocalStorageAdapter implements IAdapter<string> {
 
     constructor(private keyName: string) { }
 

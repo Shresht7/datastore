@@ -2,13 +2,13 @@
 import * as fs from 'node:fs'
 
 //  Type Definitions
-import type { Adapter } from '../types'
+import type { IAdapter } from '../types'
 
 //  ------------
 //  Text Adapter
 //  ------------
 
-export class TextAdapter implements Adapter<string> {
+export class TextAdapter implements IAdapter<string> {
 
     constructor(private fileName: string, private encoding?: BufferEncoding) {
     }
@@ -18,6 +18,7 @@ export class TextAdapter implements Adapter<string> {
     }
 
     write(data: string): Promise<void> {
+        //  TODO: It is unsafe to use `fs.promises.writeFile()` multiple times on the same file without waiting for the promise to be settled
         return fs.promises.writeFile(this.fileName, data, { encoding: this.encoding })
     }
 

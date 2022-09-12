@@ -1,20 +1,10 @@
-//  Library
-import type { Transformer } from '../types'
+import { Transformer } from './base'
 
-//  ------------
-//  JSON Adapter
-//  ------------
-
-export class JSONTransformer<T> implements Transformer<T, string> {
-
-    constructor() { }
-
-    parse(input: string): T {
-        return JSON.parse(input)
+export class JSONTransformer<T> extends Transformer<T, string> {
+    constructor() {
+        super({
+            parse: (s: string): T => JSON.parse(s),
+            serialize: (data: T): string => JSON.stringify(data)
+        })
     }
-
-    serialize(output: T): string {
-        return JSON.stringify(output, null, 2)
-    }
-
 }

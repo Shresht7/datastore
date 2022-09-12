@@ -1,70 +1,86 @@
 //  Library
-import { LocalStorageAdapter, MemoryAdapter, TextAdapter } from './adapters'
-import { JSONTransformer } from './transformers'
+import { TextAdapter, LocalStorageAdapter, MemoryAdapter } from './adapters'
+import { Transformer, NonTransformer, JSONTransformer } from './transformers'
 
 //  Type Definitions
-import { Adapter, Transformer, Kind } from './types'
+import { IAdapter, ITransformer } from './types'
 
 //  ---------
 //  DataStore
 //  ---------
 
-type DataStoreOpts<T> = {
-    kind: Kind.MEMORY
-    transformer?: Transformer<T>
-    default?: T
-} | {
-    kind: Kind.LOCAL_STORAGE
-    keyName: string
-    transformer?: Transformer<T, string>
-    default?: T
-} | {
-    kind?: Kind.FILE_SYSTEM
-    file: string
-    encoding?: BufferEncoding
-    transformer?: Transformer<T, string>
-    default?: T
+interface DataStoreOptions<T, S> {
+    data?: T
+    adapter: IAdapter<S>
+    transformer: ITransformer<T, S>
 }
 
-const defaultOptions: DataStoreOpts<any> = {
-    kind: Kind.MEMORY,
-}
+export class DataStore<T, S = T> {
 
-export class DataStore<T> {
+    public data: T | null = null
 
-    public data: T | undefined
-    private adapter: Adapter<any>
-    private transformer: Transformer<T, any>
+    private adapter: IAdapter<S>
 
-    constructor(private options: DataStoreOpts<T> = defaultOptions) {
-        this.data = this.options.default
-        this.adapter = this._loadAdapter()
-        this.transformer = this.options.transformer || new JSONTransformer<T>()
+    private transformer: Transformer<T, S>
+
+    constructor(options: DataStoreOptions<T, S>) {
+        this.data = options.data || null
+        this.adapter = options.adapter
+        this.transformer = options.transformer
     }
 
-    private _loadAdapter() {
-        switch (this.options.kind) {
-            case Kind.FILE_SYSTEM:
-                return new TextAdapter(this.options.file, this.options.encoding || 'utf-8')
-            case Kind.LOCAL_STORAGE:
-                return new LocalStorageAdapter(this.options.keyName)
-            case Kind.MEMORY:
-                return new MemoryAdapter<T>()
-            default:
-                return new MemoryAdapter<T>()
-        }
-    }
-
-    async read() {
+    public async read() {
         const contents = await this.adapter.read()
         if (!contents) { return }
-        this.data = this.transformer.parse(contents)
-        return this.data
+        return this.transformer.parse(contents)
     }
 
-    async write(data: T) {
-        const contents = this.transformer.serialize(data)
+    public async write(data: T) {
+        let contents = this.transformer.serialize(data)
         return this.adapter.write(contents)
     }
 
+}
+
+interface MemoryDataStoreOptions<T> extends Partial<DataStoreOptions<T, T>> { }
+
+export class MemoryDataStore<T> extends DataStore<T, T> {
+    constructor(options: MemoryDataStoreOptions<T> = {}) {
+        super({
+            adapter: new MemoryAdapter<T>(),
+            transformer: new NonTransformer<T>(),
+            ...options
+        })
+    }
+
+}
+
+interface FSDataStoreOptions<T> extends Partial<DataStoreOptions<T, string>> {
+    file: string
+    encoding?: BufferEncoding
+}
+
+export class FSDataStore<T> extends DataStore<T, string> {
+    constructor(options: FSDataStoreOptions<T>) {
+        super({
+            adapter: new TextAdapter(options.file, options.encoding),
+            transformer: new JSONTransformer(),
+            ...options,
+        })
+    }
+
+}
+
+interface LocalStorageDataStoreOptions<T> extends Partial<DataStoreOptions<T, string>> {
+    key: string
+}
+
+export class LocalStorageDataStore<T> extends DataStore<T, string> {
+    constructor(options: LocalStorageDataStoreOptions<T>) {
+        super({
+            adapter: new LocalStorageAdapter(options.key),
+            transformer: new JSONTransformer(),
+            ...options
+        })
+    }
 }

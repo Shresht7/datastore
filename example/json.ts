@@ -1,13 +1,13 @@
-import { DataStore } from '../src'
+import { FSDataStore } from '../src'
 
 interface Data {
     old: number
     new: number
 }
 
-const datastore = new DataStore<Data>({
+const datastore = new FSDataStore<Data>({
     file: 'example/db.json',
-    default: { old: 0, new: 0 }
+    data: { old: 0, new: 0 }
 })
 
 export async function jsonTest() {

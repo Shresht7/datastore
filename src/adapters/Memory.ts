@@ -1,11 +1,11 @@
 //  Type Definitions
-import type { Adapter } from '../types'
+import type { IAdapter } from '../types'
 
 //  --------------
 //  Memory Adapter
 //  --------------
 
-export class MemoryAdapter<T> implements Adapter<T> {
+export class MemoryAdapter<T> implements IAdapter<T> {
 
     private data: T | undefined
 
