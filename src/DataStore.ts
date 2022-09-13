@@ -32,7 +32,8 @@ export class DataStore<T, S = T> {
     public async read() {
         const contents = await this.adapter.read()
         if (!contents) { return }
-        return this.transformer.parse(contents)
+        this.data = this.transformer.parse(contents)
+        return this.data
     }
 
     public async write(data: T) {
