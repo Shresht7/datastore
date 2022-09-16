@@ -11,6 +11,7 @@ interface LocalStorageDataStoreOptions<T> extends Partial<DataStoreOptions<T, st
     key: string
 }
 
+/** The LocalStorageDataStore reads and writes to the browser's local-storage */
 export class LocalStorageDataStore<T> extends DataStore<T, string> {
     constructor(options: LocalStorageDataStoreOptions<T>) {
         super({

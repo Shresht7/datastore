@@ -7,6 +7,7 @@ import type { ITransformer } from '../types'
 
 //  ! TODO: NOT TYPE SAFE!!! - Do something about this
 
+/** Does not perform any transformation */
 export class Transformer<T, S> implements ITransformer<T, S> {
 
     public parse(s: S): T { return s as unknown as T }

@@ -12,6 +12,7 @@ interface FSDataStoreOptions<T> extends Partial<DataStoreOptions<T, string>> {
     encoding?: BufferEncoding
 }
 
+/** The FSDataStore reads and writes data from/to the file-system */
 export class FSDataStore<T> extends DataStore<T, string> {
     constructor(options: FSDataStoreOptions<T>) {
         super({

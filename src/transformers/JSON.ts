@@ -1,5 +1,7 @@
+//  Library
 import { Transformer } from './base'
 
+/** Transformer to parse and stringify JSON objects */
 export class JSONTransformer<T> extends Transformer<T, string> {
     constructor() {
         super({
