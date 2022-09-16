@@ -1,12 +1,10 @@
 {
   "name": "datastore",
-  "version": "1.0.0",
-  "description": "local datastore",
+  "version": "0.1.0",
+  "description": "A simple local persistent data storage solution",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node lib/index.js",
-    "build": "tsc",
-    "test": "test"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
