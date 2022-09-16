@@ -16,10 +16,10 @@ type AsyncReader<T> = Promisify<Reader<T>>
 type AsyncWriter<T> = Promisify<Writer<T>>
 
 /**
- * Adapters are responsible for handling the `read` and `write` mechanisms. This can be from the disk,
- * or from memory, or any other storage. Adapters implement read and write methods.
- * @property `read` {@link IAdapter.read}
- * @property `write` {@link IAdapter.write}
+ * Adapters are responsible for handling the read and write mechanisms. This can be from the disk,
+ * or from memory, or any other storage. Adapters implement `read` and `write` methods.
+ * @method `read` {@link IAdapter.read}
+ * @method `write` {@link IAdapter.write}
  */
 export interface IAdapter<T> {
     read: Reader<T> | AsyncReader<T>
@@ -28,9 +28,9 @@ export interface IAdapter<T> {
 
 /**
  * Transformers are responsible for parsing and serializing the data from and to the Adapter.
- * Transformers implement the parse and serialize methods.
- * @property `parse` {@link ITransformer.parse}
- * @property `serialize` {@link ITransformer.serialize}
+ * Transformers implement the `parse` and `serialize` methods.
+ * @method `parse` {@link ITransformer.parse}
+ * @method `serialize` {@link ITransformer.serialize}
  */
 export interface ITransformer<T, S> {
     parse: (s: S) => T
