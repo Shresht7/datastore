@@ -3,5 +3,5 @@
 //  ------------
 
 export * from './base'
-export * from './no'
+export * from './non'
 export * from './json'

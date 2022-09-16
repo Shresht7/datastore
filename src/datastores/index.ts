@@ -3,6 +3,6 @@
 //  ----------
 
 export * from './base'
-export * from './fs'
+export * from './FS'
 export * from './localStorage'
 export * from './memory'
